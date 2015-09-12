@@ -1573,7 +1573,7 @@ bool Notepad_plus::findInFiles()
 		BufferID id = MainFileManager->getBufferFromName(fileNames.at(i).c_str());
 		if (id == BUFFER_INVALID)
 		{
-			id = MainFileManager->loadFile(fileNames.at(i).c_str());
+			id = MainFileManager->loadFile(fileNames.at(i).c_str(), NULL, -1, NULL, 0, true);
 			closeBuf = true;
 		}
 

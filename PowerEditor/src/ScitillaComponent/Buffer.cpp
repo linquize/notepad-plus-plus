@@ -570,7 +570,7 @@ void FileManager::closeBuffer(BufferID id, ScintillaEditView * identifier)
 
 
 // backupFileName is sentinel of backup mode: if it's not NULL, then we use it (load it). Otherwise we use filename
-BufferID FileManager::loadFile(const TCHAR * filename, Document doc, int encoding, const TCHAR *backupFileName, time_t fileNameTimestamp)
+BufferID FileManager::loadFile(const TCHAR * filename, Document doc, int encoding, const TCHAR *backupFileName, time_t fileNameTimestamp, bool rejectBinaryFile)
 {
 	bool ownDoc = false;
 	if (doc == NULL)
@@ -594,7 +594,7 @@ BufferID FileManager::loadFile(const TCHAR * filename, Document doc, int encodin
 	char data[blockSize + 8]; // +8 for incomplete multibyte char
 	FormatType bkformat = FormatType::unknown;
 	LangType detectedLang = L_TEXT;
-	bool res = loadFileData(doc, backupFileName ? backupFileName : fullpath, data, &UnicodeConvertor, detectedLang, encoding, &bkformat);
+	bool res = loadFileData(doc, backupFileName ? backupFileName : fullpath, data, &UnicodeConvertor, detectedLang, encoding, &bkformat, rejectBinaryFile);
 	if (res)
 	{
 		Buffer* newBuf = new Buffer(this, _nextBufferID, doc, DOC_REGULAR, fullpath);
@@ -1321,7 +1321,7 @@ LangType FileManager::detectLanguageFromTextBegining(const unsigned char *data, 
 }
 
 inline bool FileManager::loadFileData(Document doc, const TCHAR * filename, char* data, Utf8_16_Read * UnicodeConvertor,
-	LangType & language, int & encoding, FormatType* pFormat)
+	LangType & language, int & encoding, FormatType* pFormat, bool rejectBinaryFile)
 {
 	FILE *fp = generic_fopen(filename, TEXT("rb"));
 	if (!fp)
@@ -1407,6 +1407,19 @@ inline bool FileManager::loadFileData(Document doc, const TCHAR * filename, char
 				{
 					if (NppParameters::getInstance()->getNppGUI()._detectEncoding)
 						encoding = detectCodepage(data, lenFile);
+					// reject binary file
+					if (rejectBinaryFile)
+					{
+						for (size_t i = 0; i < lenFile; i++)
+						{
+							// simple heuristic: detect NUL byte
+							if (data[i] == 0)
+							{
+								fclose(fp);
+								return false;
+							}
+						}
+					}
                 }
 
 				if (language == L_TEXT)
