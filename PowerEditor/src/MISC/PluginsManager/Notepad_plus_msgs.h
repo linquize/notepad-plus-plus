@@ -586,4 +586,19 @@ enum winVer{WV_UNKNOWN, WV_WIN32S, WV_95, WV_98, WV_ME, WV_NT, WV_W2K, WV_XP, WV
 	//scnNotification->nmhdr.hwndFrom = hwndNpp;
 	//scnNotification->nmhdr.idFrom = BufferID;
 
+	#define NPPN_FINDFILESSTARTED (NPPN_FIRST + 100)  // To notify plugins that find files has been started
+	//scnNotification->nmhdr.code = NPPN_FINDFILESSTARTED;
+	//scnNotification->nmhdr.hwndFrom = rootDir;
+	//scnNotification->nmhdr.idFrom = 0;
+
+	#define NPPN_FINDFILESFILE (NPPN_FIRST + 101)  // To notify plugins to query ignore a searched file during find files
+	//scnNotification->nmhdr.code = NPPN_FINDFILESENDED;
+	//scnNotification->nmhdr.hwndFrom = &std::pair(dir, fileName);
+	//scnNotification->nmhdr.idFrom = &ignore;
+
+	#define NPPN_FINDFILESENDED (NPPN_FIRST + 102)  // To notify plugins that find files has been ended
+	//scnNotification->nmhdr.code = NPPN_FINDFILESENDED;
+	//scnNotification->nmhdr.hwndFrom = rootDir;
+	//scnNotification->nmhdr.idFrom = 0;
+
 #endif //NOTEPAD_PLUS_MSGS_H

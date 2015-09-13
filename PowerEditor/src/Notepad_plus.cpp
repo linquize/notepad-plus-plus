@@ -1095,6 +1095,18 @@ bool Notepad_plus::matchInList(const TCHAR *fileName, const vector<generic_strin
 	return false;
 }
 
+bool Notepad_plus::notInIgnoreList(const TCHAR *dir, const TCHAR *fileName)
+{
+	auto input = std::make_pair(dir, fileName);
+	bool result = true;
+	SCNotification scnN;
+	scnN.nmhdr.code = NPPN_FINDFILESFILE;
+	scnN.nmhdr.hwndFrom = (void *)&input;
+	scnN.nmhdr.idFrom = (uptr_t)&result;
+	_pluginsManager.notify(&scnN);
+	return result;
+}
+
 
 void Notepad_plus::wsTabConvert(spaceTab whichWay)
 {
@@ -1360,7 +1372,7 @@ void Notepad_plus::removeEmptyLine(bool isBlankContained)
 	_findReplaceDlg.processAll(ProcessReplaceAll, &env, true);
 }
 
-void Notepad_plus::getMatchedFileNames(const TCHAR *dir, const vector<generic_string> & patterns, vector<generic_string> & fileNames, bool isRecursive, bool isInHiddenDir)
+void Notepad_plus::getMatchedFileNames(const TCHAR *dir, const vector<generic_string> & patterns, vector<generic_string> & fileNames, bool isRecursive, bool isInHiddenDir, bool applyIgnoreList)
 {
 	generic_string dirFilter(dir);
 	dirFilter += TEXT("*.*");
@@ -1379,18 +1391,18 @@ void Notepad_plus::getMatchedFileNames(const TCHAR *dir, const vector<generic_st
 			}
 			else if (isRecursive)
 			{
-				if ((lstrcmp(foundData.cFileName, TEXT("."))) && (lstrcmp(foundData.cFileName, TEXT(".."))))
+				if ((lstrcmp(foundData.cFileName, TEXT("."))) && (lstrcmp(foundData.cFileName, TEXT(".."))) && (!applyIgnoreList || notInIgnoreList(dir, foundData.cFileName)))
 				{
 					generic_string pathDir(dir);
 					pathDir += foundData.cFileName;
 					pathDir += TEXT("\\");
-					getMatchedFileNames(pathDir.c_str(), patterns, fileNames, isRecursive, isInHiddenDir);
+					getMatchedFileNames(pathDir.c_str(), patterns, fileNames, isRecursive, isInHiddenDir, applyIgnoreList);
 				}
 			}
 		}
 		else
 		{
-			if (matchInList(foundData.cFileName, patterns))
+			if (matchInList(foundData.cFileName, patterns) && (!applyIgnoreList || notInIgnoreList(dir, foundData.cFileName)))
 			{
 				generic_string pathFile(dir);
 				pathFile += foundData.cFileName;
@@ -1408,18 +1420,18 @@ void Notepad_plus::getMatchedFileNames(const TCHAR *dir, const vector<generic_st
 			}
 			else if (isRecursive)
 			{
-				if ((lstrcmp(foundData.cFileName, TEXT("."))) && (lstrcmp(foundData.cFileName, TEXT(".."))))
+				if ((lstrcmp(foundData.cFileName, TEXT("."))) && (lstrcmp(foundData.cFileName, TEXT(".."))) && (!applyIgnoreList || notInIgnoreList(dir, foundData.cFileName)))
 				{
 					generic_string pathDir(dir);
 					pathDir += foundData.cFileName;
 					pathDir += TEXT("\\");
-					getMatchedFileNames(pathDir.c_str(), patterns, fileNames, isRecursive, isInHiddenDir);
+					getMatchedFileNames(pathDir.c_str(), patterns, fileNames, isRecursive, isInHiddenDir, applyIgnoreList);
 				}
 			}
 		}
 		else
 		{
-			if (matchInList(foundData.cFileName, patterns))
+			if (matchInList(foundData.cFileName, patterns) && (!applyIgnoreList || notInIgnoreList(dir, foundData.cFileName)))
 			{
 				generic_string pathFile(dir);
 				pathFile += foundData.cFileName;
@@ -1457,7 +1469,7 @@ bool Notepad_plus::replaceInFiles()
 	}
 	vector<generic_string> fileNames;
 
-	getMatchedFileNames(dir2Search, patterns2Match, fileNames, isRecursive, isInHiddenDir);
+	getMatchedFileNames(dir2Search, patterns2Match, fileNames, isRecursive, isInHiddenDir, true);
 
 	Progress progress(_pPublicInterface->getHinst());
 	size_t filesCount = fileNames.size();
@@ -1549,7 +1561,7 @@ bool Notepad_plus::findInFiles()
 		_findReplaceDlg.getPatterns(patterns2Match);
 	}
 	vector<generic_string> fileNames;
-	getMatchedFileNames(dir2Search, patterns2Match, fileNames, isRecursive, isInHiddenDir);
+	getMatchedFileNames(dir2Search, patterns2Match, fileNames, isRecursive, isInHiddenDir, true);
 
 	_findReplaceDlg.beginNewFilesSearch();
 

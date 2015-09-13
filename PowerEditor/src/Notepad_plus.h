@@ -596,7 +596,8 @@ private:
 	bool findInCurrentFile();
 
 	bool matchInList(const TCHAR *fileName, const std::vector<generic_string> & patterns);
-	void getMatchedFileNames(const TCHAR *dir, const std::vector<generic_string> & patterns, std::vector<generic_string> & fileNames, bool isRecursive, bool isInHiddenDir);
+	bool notInIgnoreList(const TCHAR *dir, const TCHAR *fileName);
+	void getMatchedFileNames(const TCHAR *dir, const std::vector<generic_string> & patterns, std::vector<generic_string> & fileNames, bool isRecursive, bool isInHiddenDir, bool applyIgnoreList = false);
 
 	void doSynScorll(HWND hW);
 	void setWorkingDir(const TCHAR *dir);
