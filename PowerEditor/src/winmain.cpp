@@ -295,12 +295,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 	cmdLineParams._isSessionFile = isInList(FLAG_OPENSESSIONFILE, params);
 	cmdLineParams._isRecursive = isInList(FLAG_RECURSIVE, params);
 	cmdLineParams._langType = getLangTypeFromParam(params);
-	cmdLineParams._localizationPath = getLocalizationPathFromParam(params);
+	_tcsncpy(cmdLineParams._localizationPath, getLocalizationPathFromParam(params).c_str(), sizeof(cmdLineParams._localizationPath));
 	cmdLineParams._line2go = getNumberFromParam('n', params, isParamePresent);
     cmdLineParams._column2go = getNumberFromParam('c', params, isParamePresent);
 	cmdLineParams._point.x = getNumberFromParam('x', params, cmdLineParams._isPointXValid);
 	cmdLineParams._point.y = getNumberFromParam('y', params, cmdLineParams._isPointYValid);
-	cmdLineParams._easterEggName = getEasterEggNameFromParam(params, cmdLineParams._quoteType);
+	_tcsncpy(cmdLineParams._easterEggName, getEasterEggNameFromParam(params, cmdLineParams._quoteType).c_str(), sizeof(cmdLineParams._easterEggName));
 
 
 	if (showHelp)
@@ -308,7 +308,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
 	NppParameters *pNppParameters = NppParameters::getInstance();
 
-	if (cmdLineParams._localizationPath != TEXT(""))
+	if (cmdLineParams._localizationPath[0])
 	{
 		pNppParameters->setStartWithLocFileName(cmdLineParams._localizationPath);
 	}

@@ -221,8 +221,9 @@ struct CmdLineParams
 	bool _isRecursive = false;
 
 	LangType _langType = L_EXTERNAL;
-	generic_string _localizationPath;
-	generic_string _easterEggName;
+	// for interop between 32 and 64-bit, use fixed size buffers instead of C++ string class
+	TCHAR _localizationPath[MAX_PATH] = { 0 };
+	TCHAR _easterEggName[MAX_PATH] = { 0 };
 	unsigned char _quoteType = '\0';
 
 	CmdLineParams()

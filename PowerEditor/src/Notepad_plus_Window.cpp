@@ -248,10 +248,10 @@ void Notepad_plus_Window::init(HINSTANCE hInst, HWND parent, const TCHAR *cmdLin
 	scnN.nmhdr.idFrom = 0;
 	_notepad_plus_plus_core._pluginsManager.notify(&scnN);
 
-	if (not cmdLineParams->_easterEggName.empty())
+	if (not cmdLineParams->_easterEggName[0])
 	{
 		char dest[MAX_PATH];
-		wcstombs(dest, (cmdLineParams->_easterEggName).c_str(), sizeof(dest));
+		wcstombs(dest, cmdLineParams->_easterEggName, sizeof(dest));
 
 		//::MessageBoxA(NULL, destStr.c_str(), "", MB_OK);
 		if (cmdLineParams->_quoteType == 0) // Easter Egg Name
