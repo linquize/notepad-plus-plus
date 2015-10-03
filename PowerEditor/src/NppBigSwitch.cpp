@@ -479,6 +479,12 @@ LRESULT Notepad_plus::process(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPa
 				case COPYDATA_PARAMS:
 				{
 					CmdLineParams *cmdLineParam = (CmdLineParams *)pCopyData->lpData;
+					CmdLineParams temp;
+					if (pCopyData->cbData < sizeof(CmdLineParams))
+					{
+						memcpy(&temp, pCopyData->lpData, pCopyData->cbData);
+						cmdLineParam = &temp;
+					}
 					pNppParam->setCmdlineParam(*cmdLineParam);
 					NppGUI nppGui = (NppGUI)pNppParam->getNppGUI();
 					nppGui._isCmdlineNosessionActivated = cmdLineParam->_isNoSession;
